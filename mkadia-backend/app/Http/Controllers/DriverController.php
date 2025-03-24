@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Driver;
+use App\Models\DriverProfile;
 use Illuminate\Http\Request;
 
 class DriverController extends Controller {
     // Obtenir les infos d'un livreur
     public function show($id) {
-        $driver = Driver::with('user')->find($id);
+        $driver = DriverProfile::with('user')->find($id);
         if (!$driver) {
             return response()->json(['message' => 'Livreur non trouvé'], 404);
         }
@@ -23,7 +23,7 @@ class DriverController extends Controller {
 
     // Mettre à jour les infos d'un livreur
     public function update(Request $request, $id) {
-        $driver = Driver::find($id);
+        $driver = DriverProfile::find($id);
         if (!$driver) {
             return response()->json(['message' => 'Livreur non trouvé'], 404);
         }

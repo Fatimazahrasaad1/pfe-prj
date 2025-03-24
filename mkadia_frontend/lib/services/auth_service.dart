@@ -2,11 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  static const String baseUrl = 'http://10.0.2.2:8000';
+  static const String baseUrl = 'http://127.0.0.1:8000/api';
 
   // Méthode pour se connecter
-  static Future<Map<String, dynamic>> login(
-      String email, String password) async {
+  static Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/login'),
@@ -20,15 +19,19 @@ class AuthService {
         }),
       );
 
-      final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+      if (response.body.isNotEmpty) {
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
 
-      if (response.statusCode == 200) {
-        return {
-          'user': responseBody['user'],
-          'token': responseBody['token'],
-        };
+        if (response.statusCode == 200) {
+          return {
+            'user': responseBody['user'],
+            'token': responseBody['token'],
+          };
+        } else {
+          throw Exception(responseBody['error'] ?? 'Échec de la connexion');
+        }
       } else {
-        throw Exception(responseBody['error'] ?? 'Échec de la connexion');
+        throw Exception('Réponse vide du serveur');
       }
     } catch (e) {
       throw Exception('Erreur de connexion: ${e.toString()}');
@@ -36,8 +39,7 @@ class AuthService {
   }
 
   // Méthode pour s'inscrire
-  static Future<Map<String, dynamic>> register(
-      String name, String email, String password, String role) async {
+  static Future<Map<String, dynamic>> register(String name, String email, String password, String role) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/register'),
@@ -85,8 +87,7 @@ class AuthService {
       if (response.statusCode == 200) {
         return responseBody;
       } else {
-        throw Exception(responseBody['message'] ??
-            'Échec de la récupération des données utilisateur');
+        throw Exception(responseBody['message'] ?? 'Échec de la récupération des données utilisateur');
       }
     } catch (e) {
       throw Exception('Erreur de récupération: ${e.toString()}');
@@ -109,8 +110,7 @@ class AuthService {
 
       if (response.statusCode != 200) {
         final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-        throw Exception(responseBody['message'] ??
-            'Échec de l\'envoi de l\'email de réinitialisation');
+        throw Exception(responseBody['message'] ?? 'Échec de l\'envoi de l\'email de réinitialisation');
       }
     } catch (e) {
       throw Exception('Erreur: ${e.toString()}');

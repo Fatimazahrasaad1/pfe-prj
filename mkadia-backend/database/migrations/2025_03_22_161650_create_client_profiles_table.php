@@ -14,7 +14,7 @@ class CreateClientProfilesTable extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('email');
-            $table->string('phone');
+            $table->string('phone')->nullable();
             $table->string('address')->nullable();
             $table->string('avatar_url')->nullable();
             $table->timestamps();

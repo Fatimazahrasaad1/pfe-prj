@@ -22,10 +22,10 @@ class UserProvider with ChangeNotifier {
   Future<void> login(String email, String password) async {
     try {
       final response = await AuthService.login(email, password);
-      
+
       _user = User.fromJson(response['user']);
       _token = response['token'];
-      
+
       notifyListeners();
     } catch (e) {
       print('Login error: $e');
@@ -36,10 +36,10 @@ class UserProvider with ChangeNotifier {
   Future<void> register(String name, String email, String password, String role) async {
     try {
       final response = await AuthService.register(name, email, password, role);
-      
+
       _user = User.fromJson(response['user']);
       _token = response['token'];
-      
+
       notifyListeners();
     } catch (e) {
       print('Registration error: $e');
@@ -50,10 +50,10 @@ class UserProvider with ChangeNotifier {
   Future<void> fetchUser() async {
     try {
       if (_token == null) throw Exception('No token available');
-      
+
       final userData = await AuthService.fetchUser(_token!);
       _user = User.fromJson(userData);
-      
+
       notifyListeners();
     } catch (e) {
       print('Fetch user error: $e');

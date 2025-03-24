@@ -7,7 +7,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\ClientProfile;
-use App\Models\Driver;
+use App\Models\DriverProfile;
 use Hash;
 
 class UserSeeder extends Seeder
@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
             'role' => 'driver',
         ]);
 
-        Driver::create([
+        DriverProfile::create([
             'user_id' => $driver->id,
             'phone' => '987654321',
             'latitude' => 40.7128,

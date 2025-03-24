@@ -11,7 +11,7 @@ class ClientProfile extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'address', 'phone', 'avatar_url'];
+    protected $fillable = ['user_id', 'email','address', 'phone', 'avatar_url'];
 
     public function user()
     {

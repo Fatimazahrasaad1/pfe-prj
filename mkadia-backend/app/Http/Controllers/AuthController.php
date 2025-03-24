@@ -7,60 +7,43 @@ use App\Models\User;
 use App\Models\ClientProfile;
 use App\Models\DriverProfile;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
     /**
-     * Gère la connexion de l'utilisateur
+     * Handle user login
      */
     public function login(Request $request)
     {
-        // Validation des données
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required|string|min:8',
+        $credentials = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'error' => $validator->errors()->first()
-            ], 422);
+        if (!Auth::attempt($credentials)) {
+            throw ValidationException::withMessages([
+                'email' => ['The provided credentials are incorrect.'],
+            ]);
         }
 
-        // Tentative de connexion
-        $credentials = $request->only('email', 'password');
+        $user = Auth::user();
+        
+        // Revoke all existing tokens
+        $user->tokens()->delete();
+        
+        // Create new token with abilities based on role
+        $abilities = $user->role === 'driver' ? ['driver'] : ['client'];
+        $token = $user->createToken('auth-token', $abilities)->plainTextToken;
 
-        if (!auth()->attempt($credentials)) {
-            return response()->json([
-                'error' => 'Email ou mot de passe incorrect'
-            ], 401);
-        }
-
-        // Récupération de l'utilisateur et création du token
-        $user = auth()->user();
-        $token = $user->createToken('authToken')->plainTextToken;
-
-        // Récupération des données du profil selon le rôle
-        $profileData = [];
-        if ($user->role === 'driver') {
-            $profile = DriverProfile::where('user_id', $user->id)->first();
-            $profileData = [
-                'phone' => $profile->phone ?? null,
-                'latitude' => $profile->latitude ?? null,
-                'longitude' => $profile->longitude ?? null,
-            ];
-        } else {
-            $profile = ClientProfile::where('user_id', $user->id)->first();
-            $profileData = [
-                'address' => $profile->address ?? null,
-                'phone' => $profile->phone ?? null,
-                'avatarURL' => $profile->avatar_url ?? null,
-            ];
-        }
+        // Get profile data based on role
+        $profileData = $this->getProfileData($user);
 
         return response()->json([
             'user' => array_merge([
@@ -74,16 +57,18 @@ class AuthController extends Controller
     }
 
     /**
-     * Gère l'inscription d'un nouvel utilisateur
+     * Handle user registration
      */
     public function register(Request $request)
     {
-        // Validation des données
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8|confirmed',
-            'role' => 'required|string|in:client,driver',
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => ['required', 'string', 'in:client,driver'],
+            // 'phone' => ['required', 'string'],
+            // 'address' => ['required_if:role,client', 'string'],
+            'avatarURL' => ['nullable', 'string', 'url'],
         ]);
 
         if ($validator->fails()) {
@@ -92,7 +77,6 @@ class AuthController extends Controller
             ], 422);
         }
 
-        // Création de l'utilisateur
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -100,42 +84,43 @@ class AuthController extends Controller
             'role' => $request->role,
         ]);
 
-        // Création du profil selon le rôle
+        Log::info(''. $request );
+        // Create profile based on role
         if ($request->role === 'driver') {
             DriverProfile::create([
                 'user_id' => $user->id,
-                'phone' => $request->phone ?? '',
+                'email' => $request->email,
+                'phone' => $request->phone,
                 'latitude' => 0,
                 'longitude' => 0,
             ]);
         } else {
             ClientProfile::create([
                 'user_id' => $user->id,
-                'address' => $request->address ?? '',
-                'phone' => $request->phone ?? '',
-                'avatar_url' => $request->avatarURL ?? '',
+                'email' => $request->email,
+                'address' => $request->address,
+                'phone' => $request->phone,
+                'avatar_url' => $request->avatarURL,
             ]);
         }
 
-        // Création du token
-        $token = $user->createToken('authToken')->plainTextToken;
-
+        // Create token with appropriate abilities
+        $abilities = $request->role === 'driver' ? ['driver'] : ['client'];
+        $token = $user->createToken('auth-token', $abilities)->plainTextToken;
+      
         return response()->json([
-            'user' => [
+            'user' => array_merge([
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
-                'address' => $request->role === 'client' ? ($request->address ?? '') : null,
-                'phone' => $request->phone ?? '',
-                'avatarURL' => $request->role === 'client' ? ($request->avatarURL ?? '') : null,
-            ],
+            ], $this->getProfileData($user)),
             'token' => $token
         ], 201);
     }
 
     /**
-     * Gère la demande de réinitialisation de mot de passe
+     * Handle password reset request
      */
     public function forgotPassword(Request $request)
     {
@@ -151,7 +136,7 @@ class AuthController extends Controller
     }
 
     /**
-     * Gère la réinitialisation du mot de passe
+     * Handle password reset
      */
     public function resetPassword(Request $request)
     {
@@ -180,12 +165,35 @@ class AuthController extends Controller
     }
 
     /**
-     * Déconnexion de l'utilisateur
+     * Handle user logout
      */
     public function logout(Request $request)
     {
+        // Revoke the current token
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(['message' => 'Déconnexion réussie']);
+        return response()->json(['message' => 'Successfully logged out']);
+    }
+
+    /**
+     * Get profile data based on user role
+     */
+    private function getProfileData($user)
+    {
+        if ($user->role === 'driver') {
+            $profile = DriverProfile::where('user_id', $user->id)->first();
+            return [
+                'phone' => $profile->phone ?? null,
+                'latitude' => $profile->latitude ?? null,
+                'longitude' => $profile->longitude ?? null,
+            ];
+        }
+
+        $profile = ClientProfile::where('user_id', $user->id)->first();
+        return [
+            'address' => $profile->address ?? null,
+            'phone' => $profile->phone ?? null,
+            'avatarURL' => $profile->avatar_url ?? null,
+        ];
     }
 }

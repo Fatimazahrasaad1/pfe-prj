@@ -4,7 +4,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Driver;
+use App\Models\DriverProfile;
 use App\Models\User;
 
 class DriverSeeder extends Seeder
@@ -20,7 +20,7 @@ class DriverSeeder extends Seeder
         ]);
 
         // Créer un profil driver
-        Driver::create([
+        DriverProfile::create([
             'user_id' => $user->id,
             'phone' => '987654321',
             'latitude' => 40.7128,
