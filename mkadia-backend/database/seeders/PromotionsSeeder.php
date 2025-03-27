@@ -28,7 +28,7 @@ class PromotionsSeeder extends Seeder
             'is_active' => true,
             'start_date' => Carbon::now(), // Débute aujourd'hui
             'end_date' => Carbon::now()->addMonth(), // Expire dans 1 mois
-            'image_url' => 'http://10.0.2.2:8000/img/promo35%midmouth.png',
+            'image_url' => 'http://127.0.0.1:8009/img/promo35%midmouth.png',
         ]);
 
         Promotion::create([
@@ -43,7 +43,7 @@ class PromotionsSeeder extends Seeder
             'is_active' => true,
             'start_date' => Carbon::now(), // Débute aujourd'hui
             'end_date' => Carbon::now()->addMonths(6), // Expire dans 6 mois
-            'image_url' => 'http://10.0.2.2:8000/img/promo35%midmouth.png',
+            'image_url' => 'http://127.0.0.1:8009/img/promo35%midmouth.png',
         ]);
 
         // Promotions de type "fixed_amount"
@@ -59,7 +59,7 @@ class PromotionsSeeder extends Seeder
             'is_active' => true,
             'start_date' => Carbon::now(), // Débute aujourd'hui
             'end_date' => Carbon::now()->addWeeks(2), // Expire dans 2 semaines
-            'image_url' => 'http://10.0.2.2:8000/img/promo35%midmouth.png',
+            'image_url' => 'http://127.0.0.1:8009/img/promo35%midmouth.png',
         ]);
 
         Promotion::create([
@@ -74,7 +74,7 @@ class PromotionsSeeder extends Seeder
             'is_active' => true,
             'start_date' => Carbon::now(), // Débute aujourd'hui
             'end_date' => Carbon::now()->addYear(), // Expire dans 1 an
-            'image_url' => 'http://10.0.2.2:8000/img/promo35%midmouth.png',
+            'image_url' => 'http://127.0.0.1:8009/img/promo35%midmouth.png',
         ]);
 
         // Promotions de type "free_shipping"
@@ -90,7 +90,7 @@ class PromotionsSeeder extends Seeder
             'is_active' => true,
             'start_date' => Carbon::now(), // Débute aujourd'hui
             'end_date' => Carbon::now()->addWeek(), // Expire dans 1 semaine
-            'image_url' => 'http://10.0.2.2:8000/img/promo35%midmouth.png',
+            'image_url' => 'http://127.0.0.1:8009/img/promo35%midmouth.png',
         ]);
 
         Promotion::create([
@@ -105,7 +105,7 @@ class PromotionsSeeder extends Seeder
             'is_active' => true,
             'start_date' => Carbon::now(), // Débutfze aujourd'hui
             'end_date' => Carbon::now()->addMonth(), // Expire dans 1 mois
-            'image_url' => 'http://10.0.2.2:8000/img/promo35%midmouth.png',
+            'image_url' => 'http://127.0.0.1:8009/img/promo35%midmouth.png',
         ]);
     }
 }

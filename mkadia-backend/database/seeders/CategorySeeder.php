@@ -14,11 +14,11 @@ class CategorySeeder extends Seeder
     public function run()
     {
         $categories = [
-            ['name' => 'All', 'image_url' => 'http://10.0.2.2:8000/img/grid.png'],
-            ['name' => 'Fruit', 'image_url' => 'http://10.0.2.2:8000/img/fruits.png'],
-            ['name' => 'Vegetable', 'image_url' => 'http://10.0.2.2:8000/img/vegetable.png'],
-            ['name' => 'Milk & Egg', 'image_url' => 'http://10.0.2.2:8000/img/milkegg.png'],
-            ['name' => 'Meat', 'image_url' => 'http://10.0.2.2:8000/img/meat.png'],
+            ['name' => 'All', 'image_url' => 'http://127.0.0.1:8009/img/grid.png'],
+            ['name' => 'Fruit', 'image_url' => 'http://127.0.0.1:8009/img/fruits.png'],
+            ['name' => 'Vegetable', 'image_url' => 'http://127.0.0.1:8009/img/vegetable.png'],
+            ['name' => 'Milk & Egg', 'image_url' => 'http://127.0.0.1:8009/img/milkegg.png'],
+            ['name' => 'Meat', 'image_url' => 'http://127.0.0.1:8009/img/meat.png'],
         ];
 
         foreach ($categories as $category) {
