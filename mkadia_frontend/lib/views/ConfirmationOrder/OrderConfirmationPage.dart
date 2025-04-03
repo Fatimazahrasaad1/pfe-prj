@@ -20,7 +20,7 @@ class OrderConfirmationPage extends StatelessWidget {
     // Si aucune commande n'existe
     if (order == null || cartProvider.confirmedItems.isEmpty) {
       return Scaffold(
-        backgroundColor: Colors.white, 
+        backgroundColor: Colors.white,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(80),
           child: ClipRRect(
@@ -33,7 +33,7 @@ class OrderConfirmationPage extends StatelessWidget {
               backgroundColor: TColor.primaryText,
               elevation: 0,
               title: Text(
-                "Order detail",
+                "Order Detail",
                 style: TextStyle(
                   color: TColor.primary,
                   fontSize: 22,
@@ -69,17 +69,13 @@ class OrderConfirmationPage extends StatelessWidget {
     }
 
     // *Si une commande existe
-    
-    final double totalProducts = double.parse(
-      (order.items.fold(0.0, (sum, item) => sum + (item.price * item.quantity))).toStringAsFixed(2)
-    );    
-    final double tax = double.parse(
-      (totalProducts * 0.1).toStringAsFixed(2)
-    ); 
-    final double deliveryFee = 10; 
+
+    final double totalProducts = double.parse((order.items.fold(0.0, (sum, item) => sum + (item.price * item.quantity))).toStringAsFixed(2));
+    final double tax = double.parse((totalProducts * 0.1).toStringAsFixed(2));
+    final double deliveryFee = 10;
     final double totalAmount = double.parse((totalProducts + tax + deliveryFee).toStringAsFixed(2));
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: ClipRRect(
@@ -92,7 +88,7 @@ class OrderConfirmationPage extends StatelessWidget {
             backgroundColor: TColor.primaryText,
             elevation: 0,
             title: Text(
-              "Order detail",
+              "Order Detail",
               style: TextStyle(
                 color: TColor.primary,
                 fontSize: 22,

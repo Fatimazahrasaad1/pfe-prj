@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mkadia/common/color_extension.dart';
 import 'package:mkadia/models/user.dart';
 import 'package:mkadia/provider/UserProvider.dart';
 import 'package:provider/provider.dart';
@@ -14,22 +15,53 @@ class ProfilPage extends StatelessWidget {
     final user = userProvider.user;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil Utilisateur'),
-        backgroundColor: Colors.green,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () {
-              _handleLogout(context, userProvider);
-            },
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(25),
+            bottomRight: Radius.circular(25),
           ),
-        ],
+          child: AppBar(
+            toolbarHeight: 80,
+            backgroundColor: TColor.primaryText,
+            elevation: 0,
+            leading: Container(),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout, color: Colors.white),
+                onPressed: () {
+                  _handleLogout(context, userProvider);
+                },
+              ),
+            ],
+            title: Text(
+              "Profil Utilisateur",
+              style: TextStyle(
+                color: TColor.primary,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            centerTitle: true,
+          ),
+        ),
       ),
-      body: user == null
-          ? const Center(child: CircularProgressIndicator())
-          : _buildProfileContent(context, user),
+
+      // AppBar(
+      //   title: const Text('Profil Utilisateur'),
+      //   backgroundColor: TColor.primaryColor,
+      //   elevation: 0,
+      //   actions: [
+      //     IconButton(
+      //       icon: const Icon(Icons.logout),
+      //       onPressed: () {
+      //         _handleLogout(context, userProvider);
+      //       },
+      //     ),
+      //   ],
+      // ),
+      body: user == null ? const Center(child: CircularProgressIndicator()) : _buildProfileContent(context, user),
     );
   }
 
@@ -68,9 +100,7 @@ class ProfilPage extends StatelessWidget {
         radius: 50,
         backgroundImage: _getAvatarImage(user.avatarURL),
         backgroundColor: Colors.green.shade100,
-        child: (user.avatarURL == null || user.avatarURL!.isEmpty)
-            ? const Icon(Icons.person, size: 50, color: Colors.white)
-            : null,
+        child: (user.avatarURL == null || user.avatarURL!.isEmpty) ? const Icon(Icons.person, size: 50, color: Colors.white) : null,
       ),
     );
   }
@@ -79,9 +109,7 @@ class ProfilPage extends StatelessWidget {
     if (avatarURL == null || avatarURL.isEmpty) {
       return const AssetImage('assets/images/default_avatar.png');
     }
-    return avatarURL.startsWith('assets/')
-        ? AssetImage(avatarURL)
-        : NetworkImage(avatarURL) as ImageProvider;
+    return avatarURL.startsWith('assets/') ? AssetImage(avatarURL) : NetworkImage(avatarURL) as ImageProvider;
   }
 
   Widget _buildUserName(User user) {
