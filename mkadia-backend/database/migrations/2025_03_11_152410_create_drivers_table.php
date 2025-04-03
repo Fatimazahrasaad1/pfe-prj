@@ -22,6 +22,6 @@ class CreateDriversTable extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('drivers');
+        Schema::dropIfExists('driver_profiles');
     }
 }

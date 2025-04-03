@@ -59,8 +59,10 @@ class AuthController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', 'string', 'in:client,driver'],
-            'phone' => ['required', 'string'],
-            'address' => ['required_if:role,client', 'string'],
+            'phone' => ['string'],
+            // 'phone' => ['required', 'string'],
+            // 'address' => ['required_if:role,client', 'string'],
+            'address' => ['string'],
             'avatarURL' => ['nullable', 'string', 'url'],
         ]);
 
