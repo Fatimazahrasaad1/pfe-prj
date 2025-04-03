@@ -17,9 +17,6 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    /**
-     * Handle user login
-     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -34,16 +31,15 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-        
-        // Revoke all existing tokens
         $user->tokens()->delete();
         
-        // Create new token with abilities based on role
-        $abilities = $user->role === 'driver' ? ['driver'] : ['client'];
+        $abilities = match($user->role) {
+            'driver' => ['driver'],
+            'admin' => ['admin'],
+            default => ['client']
+        };
+        
         $token = $user->createToken('auth-token', $abilities)->plainTextToken;
-
-        // Get profile data based on role
-        $profileData = $this->getProfileData($user);
 
         return response()->json([
             'user' => array_merge([
@@ -51,14 +47,11 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
-            ], $profileData),
+            ], $this->getProfileData($user)),
             'token' => $token
         ]);
     }
 
-    /**
-     * Handle user registration
-     */
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -66,8 +59,8 @@ class AuthController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
             'role' => ['required', 'string', 'in:client,driver'],
-            // 'phone' => ['required', 'string'],
-            // 'address' => ['required_if:role,client', 'string'],
+            'phone' => ['required', 'string'],
+            'address' => ['required_if:role,client', 'string'],
             'avatarURL' => ['nullable', 'string', 'url'],
         ]);
 
@@ -84,8 +77,6 @@ class AuthController extends Controller
             'role' => $request->role,
         ]);
 
-        Log::info(''. $request );
-        // Create profile based on role
         if ($request->role === 'driver') {
             DriverProfile::create([
                 'user_id' => $user->id,
@@ -104,9 +95,7 @@ class AuthController extends Controller
             ]);
         }
 
-        // Create token with appropriate abilities
-        $abilities = $request->role === 'driver' ? ['driver'] : ['client'];
-        $token = $user->createToken('auth-token', $abilities)->plainTextToken;
+        $token = $user->createToken('auth-token', [$request->role])->plainTextToken;
       
         return response()->json([
             'user' => array_merge([
@@ -119,65 +108,21 @@ class AuthController extends Controller
         ], 201);
     }
 
-    /**
-     * Handle password reset request
-     */
     public function forgotPassword(Request $request)
     {
         $request->validate(['email' => 'required|email']);
-
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
-
+        $status = Password::sendResetLink($request->only('email'));
         return $status === Password::RESET_LINK_SENT
             ? response()->json(['message' => __($status)])
             : response()->json(['error' => __($status)], 400);
     }
 
-    /**
-     * Handle password reset
-     */
-    public function resetPassword(Request $request)
-    {
-        $request->validate([
-            'token' => 'required',
-            'email' => 'required|email',
-            'password' => 'required|min:8|confirmed',
-        ]);
-
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password)
-                ])->setRememberToken(Str::random(60));
-
-                $user->save();
-
-                event(new PasswordReset($user));
-            }
-        );
-
-        return $status === Password::PASSWORD_RESET
-            ? response()->json(['message' => __($status)])
-            : response()->json(['error' => __($status)], 400);
-    }
-
-    /**
-     * Handle user logout
-     */
     public function logout(Request $request)
     {
-        // Revoke the current token
         $request->user()->currentAccessToken()->delete();
-
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    /**
-     * Get profile data based on user role
-     */
     private function getProfileData($user)
     {
         if ($user->role === 'driver') {

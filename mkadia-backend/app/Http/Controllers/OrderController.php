@@ -127,4 +127,16 @@ class OrderController extends Controller
             return response()->json(['status' => false, 'message' => 'Order not found'], 404);
         }
     }
+
+public function assignDelivery(Request $request, $id)
+{
+    $request->validate([
+        'delivery_id' => 'required|exists:deliveries,id',
+    ]);
+
+    $order = Order::findOrFail($id);
+    $order->update(['delivery_id' => $request->delivery_id]);
+
+    return redirect()->back()->with('success', 'Livreur assigné avec succès.');
+}
 }

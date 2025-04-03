@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mkadia/common/color_extension.dart';
 import 'package:provider/provider.dart';
+import 'package:mkadia/common/color_extension.dart';
 import 'package:mkadia/provider/UserProvider.dart';
 import 'package:mkadia/views/home/widget/navbar.dart';
 import 'package:mkadia/views/delivery/livreur.dart';
+import 'package:mkadia/views/admin/admin_orders_page.dart';
 import 'package:mkadia/views/login/singup.dart';
 import 'package:mkadia/views/login/forget.dart';
 
@@ -22,7 +23,6 @@ class LoginScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo de l'application
                 Container(
                   height: 150,
                   width: 150,
@@ -37,8 +37,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-
-                // Titre de l'application
+                const SizedBox(height: 10),
                 Text(
                   'Mkadia',
                   style: TextStyle(
@@ -47,13 +46,11 @@ class LoginScreen extends StatelessWidget {
                     color: TColor.primaryColor,
                   ),
                 ),
-                const SizedBox(height: 80),
-
-                // Email
+                const SizedBox(height: 50),
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    labelText: 'Email/Phone number',
+                    labelText: 'Email',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -62,8 +59,6 @@ class LoginScreen extends StatelessWidget {
                   keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 15),
-
-                // Mot de passe
                 TextField(
                   controller: _passwordController,
                   obscureText: true,
@@ -76,17 +71,13 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-
-                // Mot de passe oublié
                 Align(
                   alignment: Alignment.centerRight,
                   child: GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => ForgetScreen(),
-                        ),
+                        MaterialPageRoute(builder: (context) => ForgetScreen()),
                       );
                     },
                     child: const Text(
@@ -99,8 +90,6 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 30),
-
-                // Bouton "Se connecter"
                 Consumer<UserProvider>(
                   builder: (context, userProvider, child) {
                     return ElevatedButton(
@@ -110,7 +99,7 @@ class LoginScreen extends StatelessWidget {
                           final password = _passwordController.text.trim();
 
                           if (email.isEmpty || password.isEmpty) {
-                            throw Exception('Veuillez remplir tous les champs');
+                            throw Exception('Please fill all fields');
                           }
 
                           await userProvider.login(email, password);
@@ -118,16 +107,17 @@ class LoginScreen extends StatelessWidget {
                           if (userProvider.user?.role == 'driver') {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => LivreurPage(),
-                              ),
+                              MaterialPageRoute(builder: (context) => LivreurPage()),
+                            );
+                          } else if (userProvider.user?.role == 'admin') {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => AdminOrdersPage()),
                             );
                           } else {
                             Navigator.pushReplacement(
                               context,
-                              MaterialPageRoute(
-                                builder: (context) => BottomNavBar(),
-                              ),
+                              MaterialPageRoute(builder: (context) => BottomNavBar()),
                             );
                           }
                         } catch (e) {
@@ -135,7 +125,7 @@ class LoginScreen extends StatelessWidget {
                             SnackBar(
                               content: Text(e.toString()),
                               backgroundColor: Colors.red,
-                              duration: Duration(seconds: 3),
+                              duration: const Duration(seconds: 3),
                             ),
                           );
                         }
@@ -143,6 +133,9 @@ class LoginScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 50),
                         backgroundColor: TColor.primaryColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       child: const Text(
                         'Sign in',
@@ -155,8 +148,6 @@ class LoginScreen extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 20),
-
-                // Séparateur
                 const Text(
                   "Or sign with",
                   style: TextStyle(
@@ -166,8 +157,6 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Boutons de connexion sociaux
                 Column(
                   children: [
                     OutlinedButton.icon(
@@ -175,6 +164,9 @@ class LoginScreen extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 50),
                         side: BorderSide(color: TColor.primaryColor),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       icon: Icon(Icons.account_circle, color: TColor.primaryColor),
                       label: const Text('Connect with Google'),
@@ -185,6 +177,9 @@ class LoginScreen extends StatelessWidget {
                       style: OutlinedButton.styleFrom(
                         minimumSize: const Size(double.infinity, 50),
                         side: BorderSide(color: TColor.primaryColor),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       icon: Icon(Icons.facebook, color: Colors.blue[900]),
                       label: const Text('Connect with Facebook'),
@@ -192,15 +187,11 @@ class LoginScreen extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 50),
-
-                // Lien vers l'inscription
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => SignupScreen(),
-                      ),
+                      MaterialPageRoute(builder: (context) => SignupScreen()),
                     );
                   },
                   child: Text.rich(

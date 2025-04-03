@@ -57,7 +57,7 @@ class CartProvider with ChangeNotifier {
 
   // Confirmer la commande
   void confirmOrder() async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/orders');
+    final url = Uri.parse('http://127.0.0.1:8009/api/orders');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
