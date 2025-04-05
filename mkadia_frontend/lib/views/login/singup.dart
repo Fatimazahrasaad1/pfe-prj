@@ -12,7 +12,7 @@ class SignupScreen extends StatelessWidget {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _roleController = TextEditingController();
+  final TextEditingController _roleController = TextEditingController(text: "client");
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class SignupScreen extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
                   child: Image.asset(
-                    "assets/img/logoshop.png", 
+                    "assets/img/logoshop.png",
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -47,7 +47,7 @@ class SignupScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 35,
                   fontWeight: FontWeight.bold,
-                  color: TColor.primaryColor, 
+                  color: TColor.primaryColor,
                 ),
               ),
               const SizedBox(height: 60),
@@ -93,27 +93,27 @@ class SignupScreen extends StatelessWidget {
               ),
               const SizedBox(height: 15),
 
-              // Rôle
-              DropdownButtonFormField<String>(
-                value: 'client',
-                onChanged: (String? newValue) {
-                  _roleController.text = newValue!;
-                },
-                items: <String>['client', 'driver']
-                    .map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Role',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
+              // // Rôle
+              // DropdownButtonFormField<String>(
+              //   value: 'client',
+              //   onChanged: (String? newValue) {
+              //     _roleController.text = newValue!;
+              //   },
+              //   items: <String>['client', 'driver']
+              //       .map<DropdownMenuItem<String>>((String value) {
+              //     return DropdownMenuItem<String>(
+              //       value: value,
+              //       child: Text(value),
+              //     );
+              //   }).toList(),
+              //   decoration: InputDecoration(
+              //     labelText: 'Role',
+              //     border: OutlineInputBorder(
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //   ),
+              // ),
+              // const SizedBox(height: 30),
 
               // Bouton "S'inscrire"
               ElevatedButton(
